@@ -116,13 +116,14 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             
             // calculate alpha of icon based on swiping from 0 -> 60
             let offset = convertValue(abs(translation.x), r1Min: 0, r1Max: 60, r2Min: 0, r2Max: 1)
-            //print("alpha = \(offset)")
             
             laterIcon.alpha = offset
             archiveIcon.alpha = offset
             
             // while swiping left from -60 -> -260
             if translation.x < -60 && translation.x > -260 {
+                print("archive icon alpha = \(archiveIcon.alpha)")
+
                 swipeRightActionView.alpha = 0
                 swipeLeftActionView.alpha = 1
                 laterIcon.alpha = 1
@@ -169,8 +170,8 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             //            print("showList = \(showList)")
             //            print("showReschedule = \(showReschedule)")
             //            print(velocity)
-            print(messageContainer.backgroundColor)
-            print(translation)
+            //            print(messageContainer.backgroundColor)
+            //            print(translation)
             //            print("laterVievOrigin = \(laterViewOrigin)")
             //            print("laterView = \(laterView.frame.origin.x)")
             //            print("Edge Gesture changed at: \(point)")
@@ -275,6 +276,12 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             }
             messageContainer.hidden = false
             undoAvailable = false
+            laterIcon.alpha = 0
+            listIcon.alpha = 0
+            deleteIcon.alpha = 0
+            archiveIcon.alpha = 0
+            swipeRightActionView.frame.origin.x = swipeRightActionViewOrigin
+            swipeLeftActionView.frame.origin.x = swipeLeftActionViewOrigin
         }
     }
     
