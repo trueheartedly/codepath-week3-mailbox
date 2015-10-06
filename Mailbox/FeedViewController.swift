@@ -123,7 +123,7 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             // while swiping left from -60 -> -260
             if translation.x < -60 && translation.x > -260 {
                 print("archive icon alpha = \(archiveIcon.alpha)")
-
+                
                 swipeRightActionView.alpha = 0
                 swipeLeftActionView.alpha = 1
                 laterIcon.alpha = 1
@@ -134,7 +134,7 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                 swipeLeftActionView.frame.origin.x = translation.x + swipeLeftActionViewOrigin + 60
                 
             }
-            // while swiping left from -260 ->
+                // while swiping left from -260 ->
             else if translation.x <= -260 {
                 showList = true
                 showReschedule = false
@@ -143,8 +143,8 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                 messageContainer.backgroundColor = UIColor.brownColor()
                 swipeLeftActionView.frame.origin.x = translation.x + swipeLeftActionViewOrigin + 60
             }
-            
-            // while swiping right from 60 -> 260
+                
+                // while swiping right from 60 -> 260
             else if translation.x > 60 && translation.x < 260{
                 swipeRightActionView.alpha = 1
                 swipeLeftActionView.alpha = 0
@@ -154,7 +154,7 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                 swipeRightActionView.frame.origin.x = translation.x + swipeRightActionViewOrigin - 60
             }
                 
-            // while swiping right from 260 ->
+                // while swiping right from 260 ->
             else if translation.x >= 260 {
                 archiveIcon.alpha = 0
                 deleteIcon.alpha = 1
@@ -177,7 +177,7 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             //            print("Edge Gesture changed at: \(point)")
             
             
-        // end swiping
+            // end swiping
             
         } else if panGestureRecognizer.state == UIGestureRecognizerState.Ended {
             
@@ -203,7 +203,7 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                         self.modalButton.enabled = true
                 })
                 
-            // if swiping right
+                // if swiping right
             } else if translation.x > 60 && velocity.x > 0 { //swipe far enough - animate off
                 
                 // laterView
@@ -250,9 +250,9 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         UIView.animateWithDuration(0.7, animations: { () -> Void in
             self.feedImageView.frame.origin.y = 0
             self.messageContainer.frame.origin.y = -self.messageView.frame.height
-        }, completion: { (Bool) -> Void in
-            self.messageContainer.hidden = true
-            self.undoAvailable = true
+            }, completion: { (Bool) -> Void in
+                self.messageContainer.hidden = true
+                self.undoAvailable = true
         })
         modalButton.enabled = false
     }
@@ -323,7 +323,7 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             menuView.alpha = 1
         } else if panGestureRecognizer.state == UIGestureRecognizerState.Changed {
             containerView.frame.origin.x = point.x
-
+            
         } else if panGestureRecognizer.state == UIGestureRecognizerState.Ended {
             if velocity.x > 0 {
                 UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
