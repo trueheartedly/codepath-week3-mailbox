@@ -7,21 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C4D09BC1BC22DAB006D2E11 /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D09BB1BC22DAB006D2E11 /* Common.swift */; settings = {ASSET_TAGS = (); }; };
 		2C831A3D1BBCE1E7000CEADC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C831A3C1BBCE1E7000CEADC /* AppDelegate.swift */; };
 		2C831A3F1BBCE1E7000CEADC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C831A3E1BBCE1E7000CEADC /* ViewController.swift */; };
 		2C831A421BBCE1E7000CEADC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C831A401BBCE1E7000CEADC /* Main.storyboard */; };
 		2C831A441BBCE1E7000CEADC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C831A431BBCE1E7000CEADC /* Assets.xcassets */; };
-		2C831A471BBCE1E7000CEADC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C831A451BBCE1E7000CEADC /* LaunchScreen.storyboard */; };
+		2CD25B2C1BC07FB3006CC627 /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD25B2B1BC07FB3006CC627 /* FeedViewController.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2C4D09BB1BC22DAB006D2E11 /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 		2C831A391BBCE1E7000CEADC /* Mailbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mailbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C831A3C1BBCE1E7000CEADC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C831A3E1BBCE1E7000CEADC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		2C831A411BBCE1E7000CEADC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2C831A431BBCE1E7000CEADC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		2C831A461BBCE1E7000CEADC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2C831A481BBCE1E7000CEADC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2CD25B2B1BC07FB3006CC627 /* FeedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,8 +59,9 @@
 				2C831A3C1BBCE1E7000CEADC /* AppDelegate.swift */,
 				2C831A3E1BBCE1E7000CEADC /* ViewController.swift */,
 				2C831A401BBCE1E7000CEADC /* Main.storyboard */,
+				2CD25B2B1BC07FB3006CC627 /* FeedViewController.swift */,
+				2C4D09BB1BC22DAB006D2E11 /* Common.swift */,
 				2C831A431BBCE1E7000CEADC /* Assets.xcassets */,
-				2C831A451BBCE1E7000CEADC /* LaunchScreen.storyboard */,
 				2C831A481BBCE1E7000CEADC /* Info.plist */,
 			);
 			path = Mailbox;
@@ -95,6 +98,7 @@
 				TargetAttributes = {
 					2C831A381BBCE1E7000CEADC = {
 						CreatedOnToolsVersion = 7.0;
+						DevelopmentTeam = 269F234L22;
 					};
 				};
 			};
@@ -121,7 +125,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C831A471BBCE1E7000CEADC /* LaunchScreen.storyboard in Resources */,
 				2C831A441BBCE1E7000CEADC /* Assets.xcassets in Resources */,
 				2C831A421BBCE1E7000CEADC /* Main.storyboard in Resources */,
 			);
@@ -134,7 +137,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C4D09BC1BC22DAB006D2E11 /* Common.swift in Sources */,
 				2C831A3F1BBCE1E7000CEADC /* ViewController.swift in Sources */,
+				2CD25B2C1BC07FB3006CC627 /* FeedViewController.swift in Sources */,
 				2C831A3D1BBCE1E7000CEADC /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -148,14 +153,6 @@
 				2C831A411BBCE1E7000CEADC /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		2C831A451BBCE1E7000CEADC /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				2C831A461BBCE1E7000CEADC /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -246,10 +243,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Mailbox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = jt.Mailbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -257,10 +258,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = Mailbox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = jt.Mailbox;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
@@ -283,6 +288,7 @@
 				2C831A4D1BBCE1E7000CEADC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
