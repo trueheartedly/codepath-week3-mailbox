@@ -91,6 +91,16 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        // Accessibility
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Double tap and hold, then swipe left to reschedule or right to archive."
+
+        modalButton.accessibilityLabel = "Dismiss Overlay"
+
+        feedImageView.isAccessibilityElement = true
+        feedImageView.accessibilityLabel = "Inbox Feed"
     }
     
     
@@ -226,6 +236,8 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                                 self.messageContainer.hidden = true
                                 //self.messageContainer.backgroundColor = UIColor.whiteColor()
                                 self.undoAvailable = true
+                                let action = translation.x >= 260 ? "deleted" : "archived"
+                                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, "Message \(action). Shake device to undo.")
                         })
                 })
             }
@@ -253,6 +265,7 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             }, completion: { (Bool) -> Void in
                 self.messageContainer.hidden = true
                 self.undoAvailable = true
+                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, "Message rescheduled. Shake device to undo.")
         })
         modalButton.enabled = false
     }
