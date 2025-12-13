@@ -68,6 +68,12 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         archiveIcon.alpha = 0
         modalButton.enabled = false
         
+        // Accessibility
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "New Message"
+        messageView.accessibilityHint = "Double tap and hold, then swipe left to reschedule or right to archive"
+        modalButton.accessibilityLabel = "Dismiss"
+
         // setup scrolling
         scrollView.delegate = self
         let scrollWidth:CGFloat = feedImageView.image!.size.width
