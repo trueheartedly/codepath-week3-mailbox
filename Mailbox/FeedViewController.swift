@@ -81,6 +81,12 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         // Attach it to a view of your choice. If it's a UIImageView, remember to enable user interaction
         messageView.addGestureRecognizer(panGestureRecognizer)
         
+        // ACCESSIBILITY IMPROVEMENTS
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message"
+        messageView.accessibilityHint = "Double tap and hold, then swipe left or right to manage."
+        modalButton.accessibilityLabel = "Dismiss Overlay"
+
         // edge swipe gesture
         let edgeGesture = UIScreenEdgePanGestureRecognizer(target: self, action: "onEdgePan:")
         edgeGesture.edges = UIRectEdge.Left
