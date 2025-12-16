@@ -91,6 +91,47 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
+    }
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message from James"
+        messageView.accessibilityHint = "Double tap to view, swipe left or right for actions"
+        messageView.accessibilityTraits = UIAccessibilityTraitButton
+
+        let archiveAction = UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveMessage")
+        let deleteAction = UIAccessibilityCustomAction(name: "Delete", target: self, selector: "deleteMessage")
+        messageView.accessibilityCustomActions = [archiveAction, deleteAction]
+    }
+
+    func archiveMessage() -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        completeSwipeRight()
+        return true
+    }
+
+    func deleteMessage() -> Bool {
+        messageContainer.backgroundColor = UIColor.redColor()
+        completeSwipeRight()
+        return true
+    }
+
+    func completeSwipeRight() {
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = self.screenSize.width
+        }) { (finished) in
+            self.rescheduleView.alpha = 0
+            self.listView.alpha = 0
+            UIView.animateWithDuration(0.7, animations: {
+                self.feedImageView.frame.origin.y = 0
+                self.messageContainer.frame.origin.y = -self.messageView.frame.height
+            }, completion: { (finished) in
+                self.messageContainer.hidden = true
+                self.undoAvailable = true
+            })
+        }
     }
     
     
