@@ -91,6 +91,48 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
+    }
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message"
+        messageView.accessibilityHint = "Swipe up or down to archive or reschedule"
+
+        let archiveAction = UIAccessibilityCustomAction(name: "Archive", target: self, selector: Selector("archiveMessage"))
+        let laterAction = UIAccessibilityCustomAction(name: "Later", target: self, selector: Selector("rescheduleMessage"))
+
+        messageView.accessibilityCustomActions = [archiveAction, laterAction]
+    }
+
+    func archiveMessage() -> Bool {
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = self.screenSize.width
+            self.messageContainer.backgroundColor = UIColor.greenColor()
+        }) { (finished) in
+            self.rescheduleView.alpha = 0
+            self.listView.alpha = 0
+            UIView.animateWithDuration(0.7, animations: {
+                self.feedImageView.frame.origin.y = 0
+                self.messageContainer.frame.origin.y = -self.messageView.frame.height
+            }) { (finished) in
+                self.messageContainer.hidden = true
+                self.undoAvailable = true
+            }
+        }
+        return true
+    }
+
+    func rescheduleMessage() -> Bool {
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = -self.messageView.frame.width
+            self.messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        }) { (finished) in
+            self.rescheduleView.alpha = 1
+            self.modalButton.enabled = true
+        }
+        return true
     }
     
     
