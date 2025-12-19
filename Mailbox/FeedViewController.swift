@@ -80,6 +80,15 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: "onCustomPan:")
         // Attach it to a view of your choice. If it's a UIImageView, remember to enable user interaction
         messageView.addGestureRecognizer(panGestureRecognizer)
+
+        // Accessibility
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message"
+        messageView.accessibilityHint = "Swipe left or right for actions"
+        messageView.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "Archive", target: self, selector: Selector("accessibilityArchive")),
+            UIAccessibilityCustomAction(name: "Delete", target: self, selector: Selector("accessibilityDelete"))
+        ]
         
         // edge swipe gesture
         let edgeGesture = UIScreenEdgePanGestureRecognizer(target: self, action: "onEdgePan:")
@@ -337,6 +346,34 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                     }) { (Bool) -> Void in
                         self.menuView.alpha = 0
                 }}
+        }
+    }
+
+    // MARK: - Accessibility
+
+    func accessibilityArchive() -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        performAccessibilitySwipe()
+        return true
+    }
+
+    func accessibilityDelete() -> Bool {
+        messageContainer.backgroundColor = UIColor.redColor()
+        performAccessibilitySwipe()
+        return true
+    }
+
+    func performAccessibilitySwipe() {
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = self.screenSize.width
+        }) { (finished) in
+            UIView.animateWithDuration(0.4, animations: {
+                self.feedImageView.frame.origin.y = 0
+                self.messageContainer.frame.origin.y = -self.messageView.frame.height
+            }) { (finished) in
+                self.messageContainer.hidden = true
+                self.undoAvailable = true
+            }
         }
     }
 }

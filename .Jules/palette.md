@@ -1,0 +1,3 @@
+## 2024-05-23 - Custom Gestures and VoiceOver
+**Learning:** Custom swipe gestures on standard views (like `UIImageView`) are invisible to VoiceOver users unless `isAccessibilityElement` is set. Furthermore, complex swipe logic (e.g., partial vs full swipe) cannot be replicated by standard VoiceOver gestures.
+**Action:** Always implement `UIAccessibilityCustomAction` for any custom gesture-based interaction. The implementation should call a "completion" method that performs the action logic directly, bypassing the gesture recognizer's state machine if possible or abstracting the logic into a shared helper.
