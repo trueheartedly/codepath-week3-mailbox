@@ -91,6 +91,8 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
     }
     
     
@@ -337,6 +339,49 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                     }) { (Bool) -> Void in
                         self.menuView.alpha = 0
                 }}
+        }
+    }
+
+    // MARK: Accessibility
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message"
+        messageView.accessibilityHint = "Double tap to open"
+
+        let archiveAction = UIAccessibilityCustomAction(name: "Archive", target: self, selector: "onArchiveAccessibility:")
+        let laterAction = UIAccessibilityCustomAction(name: "Later", target: self, selector: "onLaterAccessibility:")
+        messageView.accessibilityCustomActions = [archiveAction, laterAction]
+    }
+
+    func onArchiveAccessibility(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = self.screenSize.width
+        }) { _ in
+            self.collapseMessage()
+        }
+        return true
+    }
+
+    func onLaterAccessibility(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = -self.screenSize.width
+        }) { _ in
+            self.rescheduleView.alpha = 1
+            self.modalButton.enabled = true
+        }
+        return true
+    }
+
+    func collapseMessage() {
+        UIView.animateWithDuration(0.7, animations: {
+            self.feedImageView.frame.origin.y = 0
+            self.messageContainer.frame.origin.y = -self.messageView.frame.height
+        }) { _ in
+            self.messageContainer.hidden = true
+            self.undoAvailable = true
         }
     }
 }
