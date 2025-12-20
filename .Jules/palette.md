@@ -1,0 +1,3 @@
+## 2024-05-23 - Legacy Swift Accessibility
+**Learning:** When working with legacy Swift (2.x) codebases, standard accessibility APIs like `UIAccessibilityCustomAction` are available but require legacy syntax (String-based selectors, `UIColor.greenColor()`). Modern Swift reviewers/linters may flag this as incorrect, but matching the existing codebase's swift version is critical for compilation.
+**Action:** Always verify the Swift version of the target file (by looking for signatures like `animateWithDuration` or `Selector("string")`) before applying "modern" fixes. Explicitly document legacy syntax choices in PRs to avoid confusion.
