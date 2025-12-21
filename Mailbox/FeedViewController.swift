@@ -91,6 +91,15 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        // Accessibility
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message"
+        messageView.accessibilityHint = "Swipe up or down to select actions"
+
+        let archiveAction = UIAccessibilityCustomAction(name: "Archive", target: self, selector: Selector("accessibilityArchive:"))
+        let laterAction = UIAccessibilityCustomAction(name: "Later", target: self, selector: Selector("accessibilityLater:"))
+        messageView.accessibilityCustomActions = [archiveAction, laterAction]
     }
     
     
@@ -338,6 +347,30 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                         self.menuView.alpha = 0
                 }}
         }
+    }
+
+    func accessibilityArchive(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = self.screenSize.width
+            self.swipeRightActionView.frame.origin.x = self.screenSize.width
+        }) { (completed) in
+            self.messageContainer.hidden = true
+            self.undoAvailable = true
+        }
+        return true
+    }
+
+    func accessibilityLater(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = -self.screenSize.width
+            self.swipeLeftActionView.frame.origin.x = -self.swipeLeftActionView.frame.width
+        }) { (completed) in
+            self.rescheduleView.alpha = 1
+            self.modalButton.enabled = true
+        }
+        return true
     }
 }
 
