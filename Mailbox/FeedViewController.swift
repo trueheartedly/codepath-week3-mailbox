@@ -91,8 +91,22 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
     }
     
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Swipe left or right to manage"
+
+        messageView.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "Archive", target: self, selector: Selector("archiveMessage:")),
+            UIAccessibilityCustomAction(name: "Delete", target: self, selector: Selector("deleteMessage:")),
+            UIAccessibilityCustomAction(name: "Later", target: self, selector: Selector("remindLater:")),
+            UIAccessibilityCustomAction(name: "List", target: self, selector: Selector("addToList:"))
+        ]
+    }
     
     // MESSAGE SWIPE
     
@@ -338,6 +352,67 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                         self.menuView.alpha = 0
                 }}
         }
+    }
+
+    // MARK: - Accessibility Helpers
+
+    func archiveMessage(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        animateMessageRight()
+        return true
+    }
+
+    func deleteMessage(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.redColor()
+        animateMessageRight()
+        return true
+    }
+
+    func remindLater(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        showReschedule = true
+        showList = false
+        animateMessageLeft()
+        return true
+    }
+
+    func addToList(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.brownColor()
+        showList = true
+        showReschedule = false
+        animateMessageLeft()
+        return true
+    }
+
+    func animateMessageRight() {
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.swipeRightActionView.frame.origin.x = self.screenSize.width
+            self.messageView.frame.origin.x = self.screenSize.width
+            }, completion: { (Bool) -> Void in
+                self.rescheduleView.alpha = 0
+                self.listView.alpha = 0
+                UIView.animateWithDuration(0.7, animations: { () -> Void in
+                    self.feedImageView.frame.origin.y = 0
+                    self.messageContainer.frame.origin.y = -self.messageView.frame.height
+                    }, completion: { (Bool) -> Void in
+                        self.messageContainer.hidden = true
+                        self.undoAvailable = true
+                })
+        })
+    }
+
+    func animateMessageLeft() {
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.swipeLeftActionView.frame.origin.x = -self.swipeLeftActionView.frame.width
+            self.messageView.frame.origin.x = (self.messageViewOrigin - self.screenSize.width)
+            }, completion: { (Bool) -> Void in
+                if self.showReschedule == true {
+                    self.rescheduleView.alpha = 1
+                } else if self.showList == true {
+                    self.listView.alpha = 1
+                }
+                self.modalButton.enabled = true
+        })
     }
 }
 
