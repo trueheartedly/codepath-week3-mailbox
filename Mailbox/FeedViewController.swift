@@ -91,8 +91,51 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        // Accessibility
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message"
+        messageView.accessibilityHint = "Swipe up or down for actions"
+        messageView.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "Archive", target: self, selector: "accessArchive"),
+            UIAccessibilityCustomAction(name: "Delete", target: self, selector: "accessDelete"),
+            UIAccessibilityCustomAction(name: "Later", target: self, selector: "accessLater"),
+            UIAccessibilityCustomAction(name: "List", target: self, selector: "accessList")
+        ]
     }
     
+    func performAction(isRight: Bool, color: UIColor, showReschedule: Bool = false, showList: Bool = false) -> Bool {
+        self.messageContainer.backgroundColor = color
+        self.showReschedule = showReschedule
+        self.showList = showList
+
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = isRight ? self.screenSize.width : (self.messageViewOrigin - self.screenSize.width)
+        }) { _ in
+            if isRight {
+                self.rescheduleView.alpha = 0
+                self.listView.alpha = 0
+                UIView.animateWithDuration(0.7, animations: {
+                    self.feedImageView.frame.origin.y = 0
+                    self.messageContainer.frame.origin.y = -self.messageView.frame.height
+                }) { _ in
+                    self.messageContainer.hidden = true
+                    self.undoAvailable = true
+                }
+            } else {
+                if self.showReschedule == true { self.rescheduleView.alpha = 1 }
+                else if self.showList == true { self.listView.alpha = 1 }
+                self.modalButton.enabled = true
+            }
+        }
+        return true
+    }
+
+    func accessArchive() -> Bool { return performAction(true, color: UIColor.greenColor()) }
+    func accessDelete() -> Bool { return performAction(true, color: UIColor.redColor()) }
+    func accessLater() -> Bool { return performAction(false, color: UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0), showReschedule: true) }
+    func accessList() -> Bool { return performAction(false, color: UIColor.brownColor(), showList: true) }
+
     
     // MESSAGE SWIPE
     
