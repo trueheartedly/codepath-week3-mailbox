@@ -91,6 +91,48 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
+    }
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message from James"
+        messageView.accessibilityHint = "Double tap to view, or swipe up or down for actions like Archive and Later."
+
+        let archiveAction = UIAccessibilityCustomAction(name: "Archive", target: self, selector: Selector("accessibilityArchive:"))
+        let laterAction = UIAccessibilityCustomAction(name: "Later", target: self, selector: Selector("accessibilityLater:"))
+
+        messageView.accessibilityCustomActions = [archiveAction, laterAction]
+    }
+
+    func accessibilityArchive(action: UIAccessibilityCustomAction) -> Bool {
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = self.screenSize.width
+            self.messageContainer.backgroundColor = UIColor.greenColor()
+        }) { _ in
+            self.rescheduleView.alpha = 0
+            self.listView.alpha = 0
+            UIView.animateWithDuration(0.7, animations: {
+                self.feedImageView.frame.origin.y = 0
+                self.messageContainer.frame.origin.y = -self.messageView.frame.height
+            }, completion: { _ in
+                self.messageContainer.hidden = true
+                self.undoAvailable = true
+            })
+        }
+        return true
+    }
+
+    func accessibilityLater(action: UIAccessibilityCustomAction) -> Bool {
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = -self.screenSize.width
+            self.messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        }) { _ in
+            self.rescheduleView.alpha = 1
+            self.modalButton.enabled = true
+        }
+        return true
     }
     
     
@@ -340,4 +382,3 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         }
     }
 }
-
