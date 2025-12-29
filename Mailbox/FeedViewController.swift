@@ -80,6 +80,16 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: "onCustomPan:")
         // Attach it to a view of your choice. If it's a UIImageView, remember to enable user interaction
         messageView.addGestureRecognizer(panGestureRecognizer)
+
+        // Accessibility
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Message"
+        messageView.accessibilityHint = "Swipe for actions"
+        messageView.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "Archive", target: self, selector: Selector("onArchive:")),
+            UIAccessibilityCustomAction(name: "Later", target: self, selector: Selector("onLater:")),
+            UIAccessibilityCustomAction(name: "List", target: self, selector: Selector("onList:"))
+        ]
         
         // edge swipe gesture
         let edgeGesture = UIScreenEdgePanGestureRecognizer(target: self, action: "onEdgePan:")
@@ -167,15 +177,6 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                 showReschedule = false
                 messageContainer.backgroundColor = UIColor.grayColor()
             }
-            //            print("showList = \(showList)")
-            //            print("showReschedule = \(showReschedule)")
-            //            print(velocity)
-            //            print(messageContainer.backgroundColor)
-            //            print(translation)
-            //            print("laterVievOrigin = \(laterViewOrigin)")
-            //            print("laterView = \(laterView.frame.origin.x)")
-            //            print("Edge Gesture changed at: \(point)")
-            
             
             // end swiping
             
@@ -183,54 +184,13 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             
             // if swiping left
             if translation.x < -60 && velocity.x < 0 { //swipe far enough - animate off
-                
-                // laterView
-                UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
-                    self.swipeLeftActionView.frame.origin.x = -self.swipeLeftActionView.frame.width
-                    }, completion: { (Bool) -> Void in
-                })
-                
-                // messageView animates off screen
-                UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
-                    self.messageView.frame.origin.x = (self.messageViewOrigin - self.screenSize.width)
-                    }, completion: { (Bool) -> Void in
-                        if self.showReschedule == true {
-                            self.rescheduleView.alpha = 1
-                        } else if self.showList == true {
-                            self.listView.alpha = 1
-                        }
-                        //self.messageContainer.backgroundColor = UIColor.whiteColor()
-                        self.modalButton.enabled = true
-                })
-                
-                // if swiping right
-            } else if translation.x > 60 && velocity.x > 0 { //swipe far enough - animate off
-                
-                // laterView
-                UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
-                    self.swipeRightActionView.frame.origin.x = self.screenSize.width
-                    }, completion: { (Bool) -> Void in
-                })
-                
-                // messageView animates off screen
-                UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
-                    self.messageView.frame.origin.x = self.screenSize.width
-                    }, completion: { (Bool) -> Void in
-                        self.rescheduleView.alpha = 0
-                        self.listView.alpha = 0
-                        UIView.animateWithDuration(0.7, animations: { () -> Void in
-                            self.feedImageView.frame.origin.y = 0
-                            self.messageContainer.frame.origin.y = -self.messageView.frame.height
-                            //self.scrollView.contentOffset.y = 0
-                            }, completion: { (Bool) -> Void in
-                                self.messageContainer.hidden = true
-                                //self.messageContainer.backgroundColor = UIColor.whiteColor()
-                                self.undoAvailable = true
-                        })
-                })
+                completeLeftSwipe()
             }
-                
-                //swipe not far enough - return to default state
+            // if swiping right
+            else if translation.x > 60 && velocity.x > 0 { //swipe far enough - animate off
+                completeRightSwipe()
+            }
+            //swipe not far enough - return to default state
             else {
                 UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
                     self.messageView.frame.origin.x = 0
@@ -239,6 +199,73 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                 })
             }
         }
+    }
+
+    // HELPERS & ACCESSIBILITY HANDLERS
+
+    func completeRightSwipe() {
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.swipeRightActionView.frame.origin.x = self.screenSize.width
+            self.messageView.frame.origin.x = self.screenSize.width
+            }, completion: { (Bool) -> Void in
+                self.rescheduleView.alpha = 0
+                self.listView.alpha = 0
+                UIView.animateWithDuration(0.7, animations: { () -> Void in
+                    self.feedImageView.frame.origin.y = 0
+                    self.messageContainer.frame.origin.y = -self.messageView.frame.height
+                    }, completion: { (Bool) -> Void in
+                        self.messageContainer.hidden = true
+                        self.undoAvailable = true
+                })
+        })
+    }
+
+    func completeLeftSwipe() {
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.swipeLeftActionView.frame.origin.x = -self.swipeLeftActionView.frame.width
+            self.messageView.frame.origin.x = (self.messageViewOrigin - self.screenSize.width)
+            }, completion: { (Bool) -> Void in
+                if self.showReschedule == true {
+                    self.rescheduleView.alpha = 1
+                } else if self.showList == true {
+                    self.listView.alpha = 1
+                }
+                self.modalButton.enabled = true
+        })
+    }
+
+    func onArchive(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        swipeRightActionView.alpha = 1
+        swipeLeftActionView.alpha = 0
+        archiveIcon.alpha = 1
+        deleteIcon.alpha = 0
+        completeRightSwipe()
+        return true
+    }
+
+    func onLater(action: UIAccessibilityCustomAction) -> Bool {
+        showReschedule = true
+        showList = false
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        swipeLeftActionView.alpha = 1
+        swipeRightActionView.alpha = 0
+        laterIcon.alpha = 1
+        listIcon.alpha = 0
+        completeLeftSwipe()
+        return true
+    }
+
+    func onList(action: UIAccessibilityCustomAction) -> Bool {
+        showReschedule = false
+        showList = true
+        messageContainer.backgroundColor = UIColor.brownColor()
+        swipeLeftActionView.alpha = 1
+        swipeRightActionView.alpha = 0
+        listIcon.alpha = 1
+        laterIcon.alpha = 0
+        completeLeftSwipe()
+        return true
     }
     
     
