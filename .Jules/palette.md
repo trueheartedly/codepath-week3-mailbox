@@ -1,0 +1,3 @@
+## 2024-05-23 - Accessibility in Custom Gesture Interfaces
+**Learning:** In "legacy" gesture-heavy interfaces (like this Mailbox clone), standard VoiceOver accessibility is completely broken because it relies on visual coordination (swipes) that the OS doesn't automatically translate to semantic actions.
+**Action:** When implementing custom pan gestures, always pair them with `UIAccessibilityCustomAction` that triggers the same *outcome* logic. Don't try to simulate the gesture event; instead, factor out the "completion" logic into shared helper methods that both the gesture recognizer and the accessibility action can call. This ensures VoiceOver users have 1:1 parity with gesture users.
