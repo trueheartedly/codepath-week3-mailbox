@@ -91,8 +91,97 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
     }
     
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Swipe Actions available"
+
+        messageView.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveAction:"),
+            UIAccessibilityCustomAction(name: "Delete", target: self, selector: "deleteAction:"),
+            UIAccessibilityCustomAction(name: "Later", target: self, selector: "laterAction:"),
+            UIAccessibilityCustomAction(name: "List", target: self, selector: "listAction:")
+        ]
+    }
+
+    func archiveAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        swipeRightActionView.alpha = 1
+        archiveIcon.alpha = 1
+        completeRightSwipe()
+        return true
+    }
+
+    func deleteAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.redColor()
+        swipeRightActionView.alpha = 1
+        deleteIcon.alpha = 1
+        completeRightSwipe()
+        return true
+    }
+
+    func laterAction(action: UIAccessibilityCustomAction) -> Bool {
+        showReschedule = true
+        showList = false
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        swipeLeftActionView.alpha = 1
+        laterIcon.alpha = 1
+        completeLeftSwipe()
+        return true
+    }
+
+    func listAction(action: UIAccessibilityCustomAction) -> Bool {
+        showList = true
+        showReschedule = false
+        messageContainer.backgroundColor = UIColor.brownColor()
+        swipeLeftActionView.alpha = 1
+        listIcon.alpha = 1
+        completeLeftSwipe()
+        return true
+    }
+
+    func completeLeftSwipe() {
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.swipeLeftActionView.frame.origin.x = -self.swipeLeftActionView.frame.width
+        }, completion: { (Bool) -> Void in
+        })
+
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.messageView.frame.origin.x = (self.messageViewOrigin - self.screenSize.width)
+        }, completion: { (Bool) -> Void in
+            if self.showReschedule == true {
+                self.rescheduleView.alpha = 1
+            } else if self.showList == true {
+                self.listView.alpha = 1
+            }
+            self.modalButton.enabled = true
+        })
+    }
+
+    func completeRightSwipe() {
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.swipeRightActionView.frame.origin.x = self.screenSize.width
+        }, completion: { (Bool) -> Void in
+        })
+
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.messageView.frame.origin.x = self.screenSize.width
+        }, completion: { (Bool) -> Void in
+            self.rescheduleView.alpha = 0
+            self.listView.alpha = 0
+            UIView.animateWithDuration(0.7, animations: { () -> Void in
+                self.feedImageView.frame.origin.y = 0
+                self.messageContainer.frame.origin.y = -self.messageView.frame.height
+            }, completion: { (Bool) -> Void in
+                self.messageContainer.hidden = true
+                self.undoAvailable = true
+            })
+        })
+    }
     
     // MESSAGE SWIPE
     
@@ -183,51 +272,10 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
             
             // if swiping left
             if translation.x < -60 && velocity.x < 0 { //swipe far enough - animate off
-                
-                // laterView
-                UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
-                    self.swipeLeftActionView.frame.origin.x = -self.swipeLeftActionView.frame.width
-                    }, completion: { (Bool) -> Void in
-                })
-                
-                // messageView animates off screen
-                UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
-                    self.messageView.frame.origin.x = (self.messageViewOrigin - self.screenSize.width)
-                    }, completion: { (Bool) -> Void in
-                        if self.showReschedule == true {
-                            self.rescheduleView.alpha = 1
-                        } else if self.showList == true {
-                            self.listView.alpha = 1
-                        }
-                        //self.messageContainer.backgroundColor = UIColor.whiteColor()
-                        self.modalButton.enabled = true
-                })
-                
-                // if swiping right
+                completeLeftSwipe()
+            // if swiping right
             } else if translation.x > 60 && velocity.x > 0 { //swipe far enough - animate off
-                
-                // laterView
-                UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
-                    self.swipeRightActionView.frame.origin.x = self.screenSize.width
-                    }, completion: { (Bool) -> Void in
-                })
-                
-                // messageView animates off screen
-                UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
-                    self.messageView.frame.origin.x = self.screenSize.width
-                    }, completion: { (Bool) -> Void in
-                        self.rescheduleView.alpha = 0
-                        self.listView.alpha = 0
-                        UIView.animateWithDuration(0.7, animations: { () -> Void in
-                            self.feedImageView.frame.origin.y = 0
-                            self.messageContainer.frame.origin.y = -self.messageView.frame.height
-                            //self.scrollView.contentOffset.y = 0
-                            }, completion: { (Bool) -> Void in
-                                self.messageContainer.hidden = true
-                                //self.messageContainer.backgroundColor = UIColor.whiteColor()
-                                self.undoAvailable = true
-                        })
-                })
+                completeRightSwipe()
             }
                 
                 //swipe not far enough - return to default state
