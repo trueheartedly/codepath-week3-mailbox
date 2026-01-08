@@ -1,0 +1,3 @@
+## 2024-05-20 - Custom Actions for Gesture-Heavy UI
+**Learning:** For gesture-heavy interfaces like swipe-to-archive, accessibility actions must manually recreate not just the *logic* (deleting the item) but also the *visual state* (background colors, icons) if the animation logic relies on them. Refactoring completion logic into reusable helpers is essential to avoid code duplication between gesture handlers and accessibility actions.
+**Action:** When adding accessibility to gesture-controlled views, always extract the 'completion' logic into a separate function first, then call it from both the gesture recognizer and the accessibility action handler.
