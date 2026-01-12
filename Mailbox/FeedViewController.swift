@@ -91,6 +91,59 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        // accessibility
+        setupAccessibility()
+    }
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Double tap to view. Swipe up or down for actions."
+
+        let archive = UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveAction:")
+        let later = UIAccessibilityCustomAction(name: "Later", target: self, selector: "laterAction:")
+
+        messageView.accessibilityCustomActions = [archive, later]
+    }
+
+    func archiveAction(action: UIAccessibilityCustomAction) -> Bool {
+        // Visual feedback
+        messageContainer.backgroundColor = UIColor.greenColor()
+
+        // Animate off screen (Right)
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.messageView.frame.origin.x = self.screenSize.width
+            }, completion: { (Bool) -> Void in
+                self.rescheduleView.alpha = 0
+                self.listView.alpha = 0
+                // Collapse row
+                UIView.animateWithDuration(0.7, animations: { () -> Void in
+                    self.feedImageView.frame.origin.y = 0
+                    self.messageContainer.frame.origin.y = -self.messageView.frame.height
+                    }, completion: { (Bool) -> Void in
+                        self.messageContainer.hidden = true
+                        self.undoAvailable = true
+                })
+        })
+        return true
+    }
+
+    func laterAction(action: UIAccessibilityCustomAction) -> Bool {
+        // Visual feedback and State
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        showReschedule = true
+        showList = false
+
+        // Animate off screen (Left)
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.messageView.frame.origin.x = (self.messageViewOrigin - self.screenSize.width)
+            }, completion: { (Bool) -> Void in
+                // Show modal
+                self.rescheduleView.alpha = 1
+                self.modalButton.enabled = true
+        })
+        return true
     }
     
     
@@ -340,4 +393,3 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         }
     }
 }
-
