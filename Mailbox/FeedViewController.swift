@@ -91,6 +91,7 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+        setupAccessibility()
     }
     
     
@@ -338,6 +339,52 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                         self.menuView.alpha = 0
                 }}
         }
+    }
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Double tap to view, or use actions to Archive or Reschedule."
+        messageView.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveAction:"),
+            UIAccessibilityCustomAction(name: "Later", target: self, selector: "laterAction:")
+        ]
+    }
+
+    func archiveAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        archiveIcon.alpha = 1
+        swipeRightActionView.alpha = 1
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = self.screenSize.width
+            self.swipeRightActionView.frame.origin.x = self.screenSize.width
+        }) { _ in
+            self.rescheduleView.alpha = 0
+            self.listView.alpha = 0
+            UIView.animateWithDuration(0.7, animations: {
+                self.feedImageView.frame.origin.y = 0
+                self.messageContainer.frame.origin.y = -self.messageView.frame.height
+            }) { _ in
+                self.messageContainer.hidden = true
+                self.undoAvailable = true
+            }
+        }
+        return true
+    }
+
+    func laterAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        laterIcon.alpha = 1
+        swipeLeftActionView.alpha = 1
+        showReschedule = true
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = -self.screenSize.width
+            self.swipeLeftActionView.frame.origin.x = -self.swipeLeftActionView.frame.width
+        }) { _ in
+            self.rescheduleView.alpha = 1
+            self.modalButton.enabled = true
+        }
+        return true
     }
 }
 
