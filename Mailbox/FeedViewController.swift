@@ -91,6 +91,8 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
     }
     
     
@@ -339,5 +341,52 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                 }}
         }
     }
-}
 
+    // MARK: Accessibility
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Double tap to view, or use actions to manage."
+
+        messageView.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveAction:"),
+            UIAccessibilityCustomAction(name: "Later", target: self, selector: "laterAction:")
+        ]
+    }
+
+    func archiveAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        archiveIcon.alpha = 1
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = self.screenSize.width
+        }) { (Bool) -> Void in
+            self.hideMessage()
+        }
+        return true
+    }
+
+    func laterAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        laterIcon.alpha = 1
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = (self.messageViewOrigin - self.screenSize.width)
+        }) { (Bool) -> Void in
+            self.rescheduleView.alpha = 1
+            self.modalButton.enabled = true
+        }
+        return true
+    }
+
+    func hideMessage() {
+        rescheduleView.alpha = 0
+        listView.alpha = 0
+        UIView.animateWithDuration(0.7, animations: { () -> Void in
+            self.feedImageView.frame.origin.y = 0
+            self.messageContainer.frame.origin.y = -self.messageView.frame.height
+        }) { (Bool) -> Void in
+            self.messageContainer.hidden = true
+            self.undoAvailable = true
+        }
+    }
+}
