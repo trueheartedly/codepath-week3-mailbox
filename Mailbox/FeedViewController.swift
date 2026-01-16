@@ -91,6 +91,9 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        // accessibility
+        setupAccessibility()
     }
     
     
@@ -339,5 +342,53 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                 }}
         }
     }
-}
 
+    // ACCESSIBILITY
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Double tap to view. Actions: Archive, Later."
+        messageView.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveAction:"),
+            UIAccessibilityCustomAction(name: "Later", target: self, selector: "laterAction:")
+        ]
+    }
+
+    func archiveAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        hideMessage(false)
+        return true
+    }
+
+    func laterAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        showReschedule = true
+        showList = false
+        hideMessage(true)
+        return true
+    }
+
+    func hideMessage(left: Bool) {
+        let xDest = left ? (messageViewOrigin - screenSize.width) : screenSize.width
+        UIView.animateWithDuration(0.4, animations: {
+            self.messageView.frame.origin.x = xDest
+        }) { (Bool) -> Void in
+            if left {
+                if self.showReschedule == true { self.rescheduleView.alpha = 1 }
+                else if self.showList == true { self.listView.alpha = 1 }
+                self.modalButton.enabled = true
+            } else {
+                self.rescheduleView.alpha = 0
+                self.listView.alpha = 0
+                UIView.animateWithDuration(0.7, animations: {
+                    self.feedImageView.frame.origin.y = 0
+                    self.messageContainer.frame.origin.y = -self.messageView.frame.height
+                }, completion: { (Bool) -> Void in
+                    self.messageContainer.hidden = true
+                    self.undoAvailable = true
+                })
+            }
+        }
+    }
+}
