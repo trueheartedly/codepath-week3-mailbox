@@ -91,6 +91,8 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
     }
     
     
@@ -339,5 +341,73 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                 }}
         }
     }
-}
 
+    // ACCESSIBILITY
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Double tap to view content"
+
+        let archive = UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveAction:")
+        let delete = UIAccessibilityCustomAction(name: "Delete", target: self, selector: "deleteAction:")
+        let later = UIAccessibilityCustomAction(name: "Later", target: self, selector: "laterAction:")
+        let list = UIAccessibilityCustomAction(name: "List", target: self, selector: "listAction:")
+
+        messageView.accessibilityCustomActions = [archive, delete, later, list]
+    }
+
+    func archiveAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.greenColor()
+        animateMessageAway(true)
+        return true
+    }
+
+    func deleteAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.redColor()
+        animateMessageAway(true)
+        return true
+    }
+
+    func laterAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        showReschedule = true
+        showList = false
+        animateMessageAway(false)
+        return true
+    }
+
+    func listAction(action: UIAccessibilityCustomAction) -> Bool {
+        messageContainer.backgroundColor = UIColor.brownColor()
+        showList = true
+        showReschedule = false
+        animateMessageAway(false)
+        return true
+    }
+
+    func animateMessageAway(right: Bool) {
+        let destinationX = right ? screenSize.width : messageViewOrigin - screenSize.width
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.messageView.frame.origin.x = destinationX
+        }, completion: { (Bool) -> Void in
+            if right {
+                self.rescheduleView.alpha = 0
+                self.listView.alpha = 0
+                UIView.animateWithDuration(0.7, animations: { () -> Void in
+                    self.feedImageView.frame.origin.y = 0
+                    self.messageContainer.frame.origin.y = -self.messageView.frame.height
+                }, completion: { (Bool) -> Void in
+                    self.messageContainer.hidden = true
+                    self.undoAvailable = true
+                })
+            } else {
+                if self.showReschedule == true {
+                    self.rescheduleView.alpha = 1
+                } else if self.showList == true {
+                    self.listView.alpha = 1
+                }
+                self.modalButton.enabled = true
+            }
+        })
+    }
+}
