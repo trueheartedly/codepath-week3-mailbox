@@ -1,0 +1,3 @@
+## 2024-10-26 - State Management for Custom Accessibility Actions
+**Learning:** When retrofitting accessibility custom actions (`UIAccessibilityCustomAction`) onto a view that relies on gesture recognizers for state updates, implicitly unwrapped optionals (e.g., `showReschedule`) that are normally set during the gesture must be explicitly initialized. VoiceOver can trigger actions without any gesture events (`Began`, `Changed`), causing crashes if these states are nil.
+**Action:** Always audit the variables used in the "end" phase of a gesture and ensure they are initialized in `viewDidLoad` or set explicitly within the accessibility action handler before invoking shared completion logic.
