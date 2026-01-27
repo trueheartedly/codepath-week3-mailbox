@@ -91,6 +91,8 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
     }
     
     
@@ -337,6 +339,108 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                     }) { (Bool) -> Void in
                         self.menuView.alpha = 0
                 }}
+        }
+    }
+
+    // MARK: - Accessibility
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Double tap to view, or use actions to manage."
+
+        let archiveAction = UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveAction:")
+        let deleteAction = UIAccessibilityCustomAction(name: "Delete", target: self, selector: "deleteAction:")
+        let laterAction = UIAccessibilityCustomAction(name: "Later", target: self, selector: "laterAction:")
+        let listAction = UIAccessibilityCustomAction(name: "List", target: self, selector: "listAction:")
+
+        messageView.accessibilityCustomActions = [archiveAction, deleteAction, laterAction, listAction]
+    }
+
+    func archiveAction(action: UIAccessibilityCustomAction) -> Bool {
+        swipeRightActionView.alpha = 1
+        swipeLeftActionView.alpha = 0
+        archiveIcon.alpha = 1
+        deleteIcon.alpha = 0
+        messageContainer.backgroundColor = UIColor.greenColor()
+        animateMessageAway(right: true)
+        return true
+    }
+
+    func deleteAction(action: UIAccessibilityCustomAction) -> Bool {
+        swipeRightActionView.alpha = 1
+        swipeLeftActionView.alpha = 0
+        archiveIcon.alpha = 0
+        deleteIcon.alpha = 1
+        messageContainer.backgroundColor = UIColor.redColor()
+        animateMessageAway(right: true)
+        return true
+    }
+
+    func laterAction(action: UIAccessibilityCustomAction) -> Bool {
+        swipeRightActionView.alpha = 0
+        swipeLeftActionView.alpha = 1
+        laterIcon.alpha = 1
+        listIcon.alpha = 0
+        showList = false
+        showReschedule = true
+        messageContainer.backgroundColor = UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0)
+        animateMessageAway(right: false)
+        return true
+    }
+
+    func listAction(action: UIAccessibilityCustomAction) -> Bool {
+        swipeRightActionView.alpha = 0
+        swipeLeftActionView.alpha = 1
+        laterIcon.alpha = 0
+        listIcon.alpha = 1
+        showList = true
+        showReschedule = false
+        messageContainer.backgroundColor = UIColor.brownColor()
+        animateMessageAway(right: false)
+        return true
+    }
+
+    func animateMessageAway(right: Bool) {
+        if right {
+             // swipeRightActionView
+            UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+                self.swipeRightActionView.frame.origin.x = self.screenSize.width
+                }, completion: { (Bool) -> Void in
+            })
+
+            // messageView animates off screen
+            UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+                self.messageView.frame.origin.x = self.screenSize.width
+                }, completion: { (Bool) -> Void in
+                    self.rescheduleView.alpha = 0
+                    self.listView.alpha = 0
+                    UIView.animateWithDuration(0.7, animations: { () -> Void in
+                        self.feedImageView.frame.origin.y = 0
+                        self.messageContainer.frame.origin.y = -self.messageView.frame.height
+                        }, completion: { (Bool) -> Void in
+                            self.messageContainer.hidden = true
+                            self.undoAvailable = true
+                    })
+            })
+        } else {
+             // swipeLeftActionView
+            UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+                self.swipeLeftActionView.frame.origin.x = -self.swipeLeftActionView.frame.width
+                }, completion: { (Bool) -> Void in
+            })
+
+            // messageView animates off screen
+            UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+                self.messageView.frame.origin.x = (self.messageViewOrigin - self.screenSize.width)
+                }, completion: { (Bool) -> Void in
+                    if self.showReschedule == true {
+                        self.rescheduleView.alpha = 1
+                    } else if self.showList == true {
+                        self.listView.alpha = 1
+                    }
+                    self.modalButton.enabled = true
+            })
         }
     }
 }
