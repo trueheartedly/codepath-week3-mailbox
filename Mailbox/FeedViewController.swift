@@ -91,6 +91,8 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
         
         // undo
         undoAvailable = false
+
+        setupAccessibility()
     }
     
     
@@ -338,6 +340,80 @@ class FeedViewController: UIViewController, UIScrollViewDelegate {
                         self.menuView.alpha = 0
                 }}
         }
+    }
+
+    func setupAccessibility() {
+        messageView.isAccessibilityElement = true
+        messageView.accessibilityLabel = "Email Message"
+        messageView.accessibilityHint = "Double tap to view. Swipe up or down for custom actions."
+
+        let archive = UIAccessibilityCustomAction(name: "Archive", target: self, selector: "archiveAction:")
+        let delete = UIAccessibilityCustomAction(name: "Delete", target: self, selector: "deleteAction:")
+        let later = UIAccessibilityCustomAction(name: "Later", target: self, selector: "laterAction:")
+        let list = UIAccessibilityCustomAction(name: "List", target: self, selector: "listAction:")
+
+        messageView.accessibilityCustomActions = [archive, delete, later, list]
+    }
+
+    func archiveAction(action: UIAccessibilityCustomAction) -> Bool {
+        performAction(UIColor.greenColor(), icon: archiveIcon, right: true)
+        return true
+    }
+
+    func deleteAction(action: UIAccessibilityCustomAction) -> Bool {
+        performAction(UIColor.redColor(), icon: deleteIcon, right: true)
+        return true
+    }
+
+    func laterAction(action: UIAccessibilityCustomAction) -> Bool {
+        performAction(UIColor(red: 247/255.0, green: 212/255.0, blue: 59/255.0, alpha: 1.0), icon: laterIcon, right: false, showReschedule: true)
+        return true
+    }
+
+    func listAction(action: UIAccessibilityCustomAction) -> Bool {
+        performAction(UIColor.brownColor(), icon: listIcon, right: false, showList: true)
+        return true
+    }
+
+    func performAction(color: UIColor, icon: UIImageView?, right: Bool, showReschedule: Bool = false, showList: Bool = false) {
+        messageContainer.backgroundColor = color
+        // Reset all icons
+        laterIcon.alpha = 0
+        listIcon.alpha = 0
+        archiveIcon.alpha = 0
+        deleteIcon.alpha = 0
+
+        if let icon = icon {
+            icon.alpha = 1
+        }
+
+        self.showReschedule = showReschedule
+        self.showList = showList
+
+        let targetX = right ? screenSize.width : (messageViewOrigin - screenSize.width)
+
+        UIView.animateWithDuration(0.4, delay: 0, options: UIViewAnimationOptions.CurveEaseIn, animations: { () -> Void in
+            self.messageView.frame.origin.x = targetX
+        }, completion: { (Bool) -> Void in
+             if right {
+                 self.rescheduleView.alpha = 0
+                 self.listView.alpha = 0
+                 UIView.animateWithDuration(0.7, animations: { () -> Void in
+                     self.feedImageView.frame.origin.y = 0
+                     self.messageContainer.frame.origin.y = -self.messageView.frame.height
+                 }, completion: { (Bool) -> Void in
+                     self.messageContainer.hidden = true
+                     self.undoAvailable = true
+                 })
+             } else {
+                 if self.showReschedule == true {
+                     self.rescheduleView.alpha = 1
+                 } else if self.showList == true {
+                     self.listView.alpha = 1
+                 }
+                 self.modalButton.enabled = true
+             }
+        })
     }
 }
 
